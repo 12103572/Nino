@@ -1,0 +1,501 @@
+函数
+    issubclass(cls, class_or_tuple)判断一个类是否继承自 class 或 tuple
+    中的一个类，如果 cls 是 class 或 tuple 中的一个类的子类，则返回 True
+示例：
+
+
+class A:
+    pass
+
+
+class B(A):
+    pass
+
+
+class C(B):
+    pass
+
+
+issubclass(C, B)  # True
+issubclass(B, C)  # False
+
+封装    enclosure
+    封装是指隐藏类的实现细节，让使用者不关心这些细节
+    封装的目的是让使用者通过尽可能少的方法(或属性) 操作对象
+
+私有属性和方法
+    python类中以双下划线(__)开头，不以双下划线结尾的标识符为
+    私有成员，私有成员只能使用方法来进行访问
+
+示例：1，属性隐藏
+
+
+class A:
+    def __init__(self):
+        self.__money = 100  # 私有属性，只能用此类的方法来调用
+
+    def borrow(self, x):
+        if x < self.__money:
+            self.__money -= x
+            return x
+        return 0
+
+
+a = A()
+# 访问私有属性失败
+# print(a.__money)
+# a.__money -= 100 #由类的外部直接操作money属性
+# print(a.__money)
+print("借钱:", a.borrow(20))
+
+示例2：方法隐藏
+
+
+class A:
+    def __init__(self):
+        self.__money = 100  # 私有属性，只能用此类的方法来调用
+
+    def __m(self):
+        print("私有方法__m被调用")
+
+    def show_info(self):
+        self.__m()
+        print(self.__money)
+
+
+a = A()
+# a.__m()   #调用失败，不允许访问
+a.show_info()
+
+多态    polymophic
+    字面意思:   多种状态
+
+    状态：
+        静态(编译时状态)
+        动态(运行时状态)
+    说明：
+        1.多态调用方法与对象相关，不与类型相关
+        2.python全部的对象都只有"运行时状态(动态)",
+          没有C++语言里的"编译时状态(静态)"
+示例：
+
+
+class Shape:
+    def draw(self):
+        print("Shape.draw()方法被调用！")
+
+
+class Point(Shape):
+    def draw(self):
+        print("正在画一个点！！！")
+
+    def draw(self):
+        print("正在画一个圈！！ ")
+
+
+def my_draw(s):
+    s.draw()  # 此处调用谁
+
+
+s1 = Circle()
+s2 = Point()
+my_draw(s1)  # 正在画一个圈！！
+my_draw(s2)  # 正在画一个点！！！
+
+面向对象编程语言的特征：
+    继承(C语言不行)
+    封装
+    多态
+
+面向对象(思想)
+
+多继承  multiple    inheritance
+    语法：
+        class 类名(基类名1，基类名2，......)
+    说明：
+        1.一个子类同时继承自多个父类，父类中的方法可以同时被继承下来
+        2.如果两个父类中有同名的方法，而在子类中又没有覆盖此方法，调用
+          结果难以确定
+示例1：
+
+
+class Palne:
+    def fly(self, height):
+        print("飞机以海拔", height, "米的高度飞行")
+
+
+class Car:
+    def run(self, speed):
+        print("汽车以", speed, "公里/小时的速度行驶")
+
+
+class PlaneCar(Palne, Car):
+    '''PlaneCar 继承自Plane 和Car 类'''
+
+
+p1 = PlaneCar()
+p1.fly(10000)
+p1.run(300)
+
+多继承的问题
+    标识符冲突的问题
+        要谨慎使用多继承
+    支持多继承的编程语言    python  C++
+    不支持多继承的编程语言 Java Swift
+示例：
+#   多继承的名字冲突问题示例
+
+#   小张写了一个类 A
+
+
+class A:
+    def m(self):
+        print("A.m() 被调用")
+#   小李写了一个类 B
+
+
+class B:
+    def m(self):
+        print("B.m() 被调用")
+#   小王觉得小张和小李写的类都可以用
+
+
+class AB(B, A):  # 和基类顺序有关
+    pass
+
+
+ab = AB()
+ab.m()
+              方法      解决    顺序
+多继承的 MRO(Method Resolution Order) 问题
+    类的 __mro__ 属性
+        此属性用于记录当前类的方法的查找顺序
+
+钻石继承(又名棱形继承)
+    A
+   / \
+  B   C
+  \  /
+    D
+示例：
+class A:
+    def go(self):
+        print("A")
+class B(A):
+    def go(self):
+        print("B")
+        super().go()  # C
+class C(A):
+    def go(self):
+        print("C")
+        super().go() # A
+class  D(B,C):
+    def go(self):
+        print("D")
+        super().go()  # B
+d = D()
+d.go()  # D
+print(D.__mro__)
+(<class '__main__.D'>, <class '__main__.B'>,
+ <class '__main__.C'>, <class '__main__.A'>, <class 'object'>)
+
+对象转字符串函数的使用
+    repr(x)     返回一个符合python语法规则且能代表此对象的
+                表达式字符串
+        通常：
+            eval(repr(obj)) == obj   为 True
+    str(x)      返回一个代表对象的字符串(这个字符串通常是给我阅读的)
+
+示例：
+    s = "I'm a Teacher"
+    sr = repr(s)
+    ss = str(s)
+    print(sr)   #"I'm a Teacher" 让解释执行器看的懂的表达式
+    print(ss)   #I'm a Teacher 人看的懂的字符串
+
+函数重写
+    什么是函数重写
+        在自定义的类内添加相应的方法，让自定义的类
+        创建的对象能想内建对象一样进行内建函数操作
+
+对象转字符串函数的重写方法
+    repr()  函数的重写方法
+        def __repr__(self):
+            ...
+    str()   函数的重写方法
+        def __str__(self):
+            ......
+str(obj)    函数说明：
+        1. 函数先查找obj._str__() 方法，调用此方法
+           并返回结果
+        2.如果 obj.__str__() 方法不存在，则调用obj.__repr__
+          方法并返回结果
+        3.如果obj.__repr__() 方法不存在，则调用object类的
+        __str__ 示例方法显示 <__main__.Xxxx object at 0xXXXXXXXX>
+        格式的字符串
+
+示例：
+class MyNumber:
+    '''自定义一个数字类，用来表示自己定义的数字信息'''
+    def __init__(self,value):
+        '''初始化方法'''
+        self.data = value
+    def __str__(self):
+        return "数字:"+str(self.data)
+    def __repr__(self):
+        return "Mynumber(%d)"%self.data
+n1 = MyNumber(100)
+print(str(n1))  #数字100,str(n1)相当于 n1.__str__()
+print(repr(n1)) #调用 n1.__repr__()
+
+# n2 = MyNumber(200)
+
+L = list(range(5))
+s = str(L)
+print(s)  #[0, 1, 2, 3, 4]
+s2 = L.__str__()
+print(s2)  #[0, 1, 2, 3, 4]
+
+内建函数的重写
+方法名              说明
+__abs__         abs(obj)        函数调用
+__len__         len(obj)        函数调用
+__reversed__    reversed(obj)   函数调用
+__round__       round(obj)      函数调用
+
+示例:
+class Mylist:
+    def __init__(self,iterable=()):
+        self.data = [x for x in iterable]
+    def __repr__(self):
+        return "Mylist(%s)"%self.data
+    def __len__(self):
+        '''此方法必须返回整数'''
+        # return self.data.__len__()
+        return len(self.data)
+    def __abs__(self):
+        L = [abs(x) for x in self.data]
+        lst = Mylist(L)   #创建 Mylist类型的新列表
+        return  lst
+    # def __reversed__(self):
+    #     return reversed(self.data)
+
+myl = Mylist([1,-2,3,-4,5])
+print(myl)          #<xxxx>
+print(len(myl))     #出错
+
+myl2 = abs(myl)
+print(myl2)   #Mylist[1,2,3.4,5]
+# myl3 = reversed(myl)
+# print(myl3)
+
+
+数据转换函数重写
+    方法名          对应函数名
+__complex__         complex(x)
+__int__             int(x)
+__float__           float(x)
+__bool__            bool(x)
+
+示例:
+class MyNumber:
+    '''自定义一个数字类，用来表示自己定义的数字信息'''
+    def __init__(self,value):
+        '''初始化方法'''
+        self.data = value
+    def __repr__(self):
+        return "Mynumber(%d)"%self.data
+    def __int__(self):
+        n = int(self.data)
+        return n
+n1 = MyNumber(100)
+i = int(n1)
+print("i=",i)
+
+布尔测试函数的重写
+    格式：
+        def __bool__(self):
+            return 布尔值
+    作用：
+        用于bool(obj) 函数取值
+        用于if 语句真值表达式中
+        用于while 语句的真值表达式中
+    说明：
+        1.当自定义的类内有 __bool__(self) 方法时，
+          bool(obj) 调用此方法返回值
+        2.当不存在 __bool__(self) 方法时，bool(obj)
+        返回 obj.__len__()的值，判断是否为零来测试布尔值
+        3.当不存在__len__(self)方法时，则直接返回 True
+示例:
+class Mylist:
+    def __init__(self,iterable=()):
+        self.data = [x for x in iterable]
+    def __repr__(self):
+        return "Mylist(%s)"%self.data
+    def __len__(self):
+        # return self.data.__len__()
+        return len(self.data)
+    def __bool__(self):
+        print("__bool__被调用")
+        for x in self.data:
+            if bool(x) == False:
+                return False
+        return True
+myl = Mylist([1,None,0,4,5])
+print(bool(myl))
+if myl:   #<<<------相当于 if bool(myl)
+    print("真值")
+else:
+    print("假值")
+
+对象的属性管理函数：
+    参见文档：
+        内建函数(builtins).html
+    函数：
+        getattr(obj,name[,default])
+        hasattr(obj,name)
+        setattr(obj,name,value)
+        delattr(obj,name)
+
+函数	说明
+getattr(obj, name[, default])	从一个对象得到对象的
+        属性；getattr(x, 'y') 等同于x.y; 当属性
+        不存在时,如果给出default参数,则返回default,
+        如果没有给出default 则产生一个AttributeError错误
+hasattr(obj, name)	用给定的name返回对象obj是否有此
+            属性,此种做法可以避免在getattr(obj, name)
+            时引发错误
+setattr(obj, name, value)	给对象obj的名为name的
+            属性设置相应的值value, set(x, 'y', v)
+            等同于 x.y = v
+delattr(obj, name)	删除对象obj中的name属性,
+                    delattr(x, 'y') 等同于 del x.y
+
+示例：
+class Dog:
+    pass
+d = Dog()
+d.color = '白色'
+v = getattr(d, 'color')   # 等同于 v = d.color
+v = getattr(d, 'kinds')  # 出错,没有d.kinds属性
+v = getattr(d, 'kinds', '没有这个属性')  # v= '没有这个属性'
+hasattr(d, 'color')  # True
+hasattr(d, 'kinds')  # False
+setattr(d, 'kinds', '京巴')  # 等同于d.kinds ='京巴'
+hasattr(d, 'kinds')  # True
+delattr(d, 'kinds')  # 等同于 del d.kinds
+hasattr(d, 'kinds')  # False
+
+迭代器(高级/终极)
+    什么是迭代器：
+        可以通过next函数取值的对象就是迭代器
+    迭代器协议
+        迭代器协议是指对象能够使用next函数获取下一项
+        数据，在没有下一项数据时触发一个StopIteration
+        异常，来终止迭代的约定
+    迭代器协议实现的方法：
+        方法名                      对应函数
+    def __next__(self):            next(obj)
+
+什么是可迭代对象：
+    是指能用iter(obj) 函数返回迭代器的对象叫可迭代对象
+可迭代对象内部需要定义__iter__(self)方法来返回迭代器
+         方法名                      对应函数
+    def __iter__(self):            iter(obj)
+
+小结：
+有__iter__方法的对象叫可迭代对象
+有__next__方法的对象叫迭代器
+
+示例：
+class Mylist:
+    def __init__(self,iterable=()):
+        self.data = [x for x in iterable]
+    def __repr__(self):
+        return "Mylist(%s)"%self.data
+    def __iter__(self):
+        '''有此方法的对象可以用iter(obj)来获取迭代器'''
+        return MylistIterable(self.data)
+class MylistIterable:
+    '''此类用于创建一个迭代器，此迭代器可以用来访问Mylist类型对象'''
+    def __init__(self,lst):
+        self.data                                                                   2 = lst
+        self.index = 0 #用来记录此迭代器当前访问的地点
+    def __next__(self):
+        if self.index >= len(self.data2):
+            raise StopIteration
+        r = self.data2[self.index]
+        self.index += 1
+        return r
+myl = Mylist([1,-2,3,-4,5])
+# for x in myl:
+#     print(x)
+
+it = iter(myl)    # it = myl.__iter__()
+while True:
+    try:
+        x = next(it)   # x = myl.__next__()
+        print(x)
+    except StopIteration:
+        break
+
+练习：
+    实现一个与系统内建的range类相同功能的类
+    class NyRange:
+        def __init__(self):
+
+        def __iter__(self):
+            ...
+    测试调用如下：
+    L= list(range(5))
+    print(L)  #[0,1,2,3,4]
+    print(sum(MyRange(1,101,)))  #5050
+    L2 = [x**2 for x in MyRange(1,10,3)]
+    print(L2) #[1,4,7]
+    for x in MyRange(10,0,-3):
+        print(x)  #打印： 10,7,4,1
+
+class MyRange:
+    def __init__(self,start,stop=None,step=None):
+        if stop is None:
+            stop = start
+            start = 0
+        if step is None:
+            step = 1
+        self.start =start
+        self.stop =stop
+        self.step = step
+    def __iter__(self):
+        return Myrange(self.start,self.stop,self.step)
+class Myrange:
+    def __init__(self,start,stop,step):
+        self.start = start
+        self.stop = stop
+        self.step = step
+    def __next__(self):
+        if self.step >0:
+            if self.start >=self.stop:
+                raise  StopIteration
+            r = self.start
+            self.start += self.step
+            return r
+        elif self.step <0:
+            if self.start <= self.stop:
+                raise StopIteration
+            r = self.start
+            self.start += self.step
+            return r
+        else:
+            raise ValueError
+L= list(range(5))
+print(L)  #[0,1,2,3,4]
+print(sum(MyRange(1,101,)))  #5050
+L2 = [x**2 for x in MyRange(1,10,3)]
+print(L2) #[1,4,7]
+for x in MyRange(10,0,-3):
+    print(x)  #打印： 10,7,4,1
+
+练习：
+    修改原学生管理系统的Student类，将此类创建的对象的实例
+    属性name,age,score 改为私有属性隐藏起来，让此类以外
+    的代码无法访问对象的属性

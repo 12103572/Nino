@@ -1,0 +1,453 @@
+类属性(也叫类变量)
+   属性是依赖于某个变量的对象
+    类属性是类的变量，此属性属于类，不属于此类的实例
+
+作用：
+   通常用来记录该类创建的对象的共有属性
+说明：
+   1.类变量可以通过该类直接访问(示例1)
+    2.类属性可以通过类的实例直接访问(示例2)
+    3.类属性可以通过此类的对象的__class__属性间接访问(示例3)
+对象：
+    函数 def
+    数字 1   3.14 int("100")
+    模块 import math
+    包 import mypack
+    列表[1, 2, 3, 4]
+    实例    dog1 = Dog
+    类 class
+示例1
+
+
+class Human:
+    '''此示例示意类变量'''
+    count = 0  # 创建类属性(类变量)
+
+
+print(Human.count)  # 获取类变量绑定的值
+Human.count = 100   # 修改类属性
+print(Human.count)
+
+示例2：
+
+
+class Human:
+    '''此示例示意类变量'''
+    count = 0
+
+
+h1 = Human()
+print(h1.count)  # 访问类的属性(而不是实例属性)
+
+h1.count = 100  # 创建实例属性(而不是修改类属性)
+print(h1.count)  # 优先访问实例属性(当实例属性不存在时，才访问类属性)
+print(Human.count)
+
+示例3:
+
+
+class Human:
+    '''此示例示意类变量'''
+    count = 0
+
+
+print(Human.count)  # 0
+h1 = Human()
+h1.__class__.count = 100  # 可以通过__class__属性访问类
+print(Human.count)
+
+示例4：(综合示例)
+# 看懂下列代码中的类属性count的作用是什么
+
+
+class Human:
+    '''此示例示意类变量'''
+    count = 0
+
+    def __init__(self, name):
+        print(name, "对象被创建")
+        self.name = name
+        self.__class__.count += 1
+
+    def __del__(self):
+        print(self.name, "对象被销毁")
+        self.__class__.count -= 1
+
+
+L = [Human("孙悟空"), Human("猪八戒")]
+h1 = Human("沙僧")
+print("现在共有", Human.count, "个对象")
+del L
+print("现在共有", Human.count, "个实例对象 ")
+
+类的文档字符串
+   类内第一个没有赋值给任何变量的字符串为类的文档字符串
+    类的文档字符串可以通过help函数查看
+    类的文档字符串可以用类的__doc__属性访问
+
+示例：
+   class Dog:
+        '''这是类的文档字符串
+        此字符串用来描述Dog对象的行为'''
+
+        def eat(self, food):
+            '此方法用于描述小狗吃东西的行为'
+
+    help(Dog)
+    print(Dog.__doc__)
+
+类的__slots__ 列表
+   作用：
+       1.限定一个类创建的实例只能有固定的实例属性，
+           不允许添加此列表以外的实例属性
+        2.防止因错误实例属性的名称而发生程序逻辑错误
+    说明：
+       1. __slots__ 属性是一个列表，列表的值是字符串
+        2. 含有 __slots__ 属性的类所创建的实例对象没有 __dict__ 属性，
+           即此实例不用字典来存储对象的实例属性
+示例：
+
+
+class Human:
+    # 此 __slots__ 列表限定Human类型的对象只能有一个age属性
+    __slots__ = ["age"]
+    def __init__(self, age):
+        self.age = age
+
+    def show_info(self):
+        print("年龄是", self.age)
+
+h1 = Human(10)
+h1.show_info()
+# h1.Age = 11   #报错
+h1.show_info()
+
+类方法 @classmethod
+   类方法是用于描述类的行为的方法，类方法属于类，不属于类的实例
+
+    说明：
+       类方法需要使用@classmethod 装饰器定义
+        类方法至少有一个形参，第一个形参用于绑定类，约定写为"cls"
+        类和该类的实例都可以调用类方法
+        类方法不能访问此类创建的对象的实例属性
+示例：
+# 此示例示意用类方法来访问类属性和改变类属性
+
+
+class A:
+    v = 0  # 类属性
+
+    @classmethod
+    def get_v(cls):
+        return cls.v
+
+    @classmethod
+    def set_v(cls, v):
+        cls.v = v
+print(A.v)  # 0
+print(A.get_v())  # 0
+A.set_v(80)
+print(A.get_v())  # 80
+print(A.v)  # 80
+
+示例2：
+# 此示例示意 类和该类的实例都可以调用类方法
+
+
+class A:
+    v = 0  # 类属性
+
+    @classmethod
+    def get_v(cls):
+        return cls.v
+
+    @classmethod
+    def set_v(cls, v):
+        cls.v = v
+
+print(A.get_v())  # 0
+a = A()
+print(a.get_v())  # 0
+a.set_v(100)
+print(a.get_v())  # 100
+print(A.get_v())  # 100
+
+示例3：
+# 此示例示意类方法不能访问此类创建的对象的实例属性
+
+
+class A:
+    v = 0  # 类属性
+
+    @classmethod
+    def get_v(cls):
+        return cls.v
+
+    @classmethod
+    def set_v(cls, v):
+        cls.v = v
+
+a1 = A()  # 创建一个对象
+a1.v = 9999  # 创建实例属性
+a1.set_v(8888)
+print(A.get_v())  # 8888
+
+静态方法： @staticmethod
+   静态方法是定义在类内部的函数，此函数的作用域是类的内部
+
+    说明：
+       静态方法需要使用 @staticmethod 装饰器定义
+        静态方法与普通函数定义相同，不需要传入self 和 cls 参数
+        静态方法只能凭借该类或类创建的实例调用
+        静态方法不能访问类属性和实例属性
+
+示例1：
+
+
+class A:
+    @staticmethod
+    def myadd(a, b):
+        return a+b
+print(A.myadd(100, 200))         #300
+print(A.myadd("ABC", "123"))    #ABC 123
+a = A()
+print(a.myadd(3, 5)) #8
+
+练习：
+   用类来描述一个学生的信息：(可以修改之前写的student类)
+    如：
+       class Student:
+
+        将这些学生对象存于列表中，写函数或方法实现添加学生和删除学生信息等操作
+           1.打印学生的个数
+            2.打印学生的平均成绩
+
+
+class Stundent:
+    __slots__ = ["name", "age","score"]
+    def __init__(self, name,age,score=0):
+        self.name = name
+        self.age = age
+        self.score = score
+
+infos = []
+def add_student(infos, name,age,score):
+    '''添加一个学生信息'''
+    s = Stundent(name, age,score)
+    infos.append(s)
+
+
+def del_student(infos):
+    n = input("请输入要删除的学生的姓名")
+    for index, s  in enumerate(infos):
+        if s.name == n:
+            del infos[index]
+            print("删除", n,"成功")
+            return
+    print("删除失败！")
+
+
+def get_score(infos):
+    m = 0
+    for s in infos:
+        m += s.score
+    return m/len(infos)
+add_student(infos, "小张",20, 100)
+add_student(infos, "小李",18, 66)
+add_student(infos, "小王",19, 55)
+add_student(infos, "小赵",22, 88)
+del_student(infos)
+print(len(infos))
+print("平均成绩是", get_score(infos))
+
+继承(inheritance)
+   什么是继承？
+       继承是指从已有的类中派生出新类，新类具有原类的数据属性和行为
+        并能扩展新的行为
+
+名词：
+   继承/派生
+    派生指从原类衍生出新的
+为什么继承/派生
+   继承的目的是延续旧类的功能
+    派生的目的是在旧类的基础上添加新的功能
+作用：
+   用继承派生机制，可以将一些共有功能加在基类中，实现代码的共享
+    在不改变基类的代码的基础上改变原有类的功能
+名词：
+    基类(base class) / 超类(super class) / 父类(father class)
+    派生类(derived class)   / 子类 (child class)
+
+单继承
+   单继承是指一个派生类由一个基类衍生出来的
+    语法：
+       class 类名(基类名)：
+           语句块
+    示例见：
+# 此示例示意继承的语法和用法
+
+
+class Human:
+    '''定义人类的基类'''
+    def say(self, what):
+        print("say", what)
+    def walk(self, distance):
+        print("run", distance,"公里")
+
+h1 = Human()
+h1.say("天气变冷了")
+h1.walk(5)
+
+
+class Teacher(Human):
+    def teach(self, sbject):
+        print("teach", sbject)
+
+t1 = Teacher()
+t1.teach("继承/派生")
+t1.walk(6)
+t1.say("晚上吃啥啊")
+
+
+class Student(Teacher):
+    def study(self, sbject):
+        print("study", sbject)
+
+s1 = Student()
+s1.walk(4)
+s1.say("感觉还好")
+s1.study("面向对象")
+s1.teach("王者荣耀")
+
+# 思考:
+#     list 类里提供了几个方法,但没有提供带有一个参数的头部添加数据
+# 的方法,试题能否在不改变原列表类 list的基础上,创建一个新的类
+# Mylist,新类继承原类的全部的功能,并添加一个insert_head(n)的方法
+# 如：
+#     class Mylist(list):
+#         def insert_head(self,n):
+#
+# myl = Mylist(range(3,6))
+# print(myl)  #[3,4,5]
+# my.insert_head(2)
+# print(myl)  #[2,3,4,5]
+# myl.append(6)
+# print(myl)  #[2,3,4,5,6]
+
+
+class Mylist(list):
+    def insert_head(self, n):
+        # self.reverse()
+        # self.append(n)
+        # self.reverse()
+        self.insert(0, n)
+        # self[::]=[n]
+myl = Mylist(range(3,6))
+print(myl)
+myl.insert_head(2)
+print(myl)
+myl.append(6)
+print(myl)
+
+继承说明：
+   python3 中任何类都直接或间接的继承自object类
+    object类是一切类的基类
+    仅限在python3中
+
+类的 __base__ 属性
+   __base__ 属性用来记录此类的基类
+
+python3 的类的继承关系见：
+    >> >help(__builtins__)
+
+覆盖 override
+什么是覆盖
+   覆盖是指在有继承关系的类中，子类实现了与基类同名的方法，在子类
+    的实例调用该方法时，实例调用的是子类中的覆盖版本，这种现象叫覆盖
+    作用:
+        修改父类的功能(行为)
+    示例：
+
+
+class A:
+    def work(self):
+        print("A.WORK被调用！！！")
+
+
+class B(A):
+    def work(self):
+        print("B.work被调用!!!")
+b = B()
+b.work()  # B.work被调用!!!
+A.work(b)  # A.WORK被调用！！！
+
+问题：
+   当覆盖发生时，子类对象能否调用父类中的被覆盖方法？
+
+子类对象显式调用基类方法的方式：
+   基类名.方法名.(实例，实例调用参数)
+
+super 函数：
+   作用：
+       借助super() 返回的实例间接调用其父类的覆盖方法
+    语法：
+        super(cls, obj)  返回绑定超类的实例(要求obj必须为cls 类型
+                                  或cls子类的对象)
+        super()         返回绑定的超类的实例，等同于：
+            super(self.__class__, 实例方法的第一个参数)，
+            必须在方法内调用！
+示例：
+
+
+class A:
+    def work(self):
+        print("A.WORK被调用！！！")
+
+
+class B(A):
+    def work(self):
+        print("B.work被调用!!!")
+
+    def do_somthing(self):
+        # 1.调用自己的work
+        self.work()
+        # 2.调用父类的work
+        # super(B, self).work()
+        super().work()
+
+b = B()
+# super(B,b).work()   #借助于b来调用A类的方法
+b.do_somthing()
+
+显示调用基类的初始化方法__init__
+   当子类中实现了__init__方法，基类的初始化方法并不会被调用
+    此时需要显式调用父类的初始化方法来初始化父类对象
+
+示例见：
+
+
+class Human:
+    def __init__(self, n,a):
+        self.name = n
+        self.age = a
+        print("Humande __init__被调用")
+
+    def show_info(self):
+        print("姓名：", self.name)
+        print("年龄：", self.age)
+
+
+class Student(Human):
+    def __init__(self, n,a,s=0):
+        super().__init__(n, a) #显式调用父类的方法
+        self.score = s  # 在此类中添加新的属性
+        print("Student.__init__被调用!")
+
+    def show_info(self):
+        super().show_info()
+        print("成绩：", self.score)
+s1 = Student("小张", 20)
+s1.show_info()
+
+练习:
+    1.看懂学生信息管理系统的示例代码

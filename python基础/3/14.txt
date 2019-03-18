@@ -1,0 +1,301 @@
+异常(基础)  Exception
+什么是错误?
+    错误是指由于逻辑或语法等导致一个程序无法正常执行的问题
+
+错误的特点:
+    有些错误无法预知
+
+什么是异常?
+    异常是程序出错时标识的一种状态
+    当异常发生时，程序不会再向下执行，而转去调用此函数的地方处理
+    此错误并恢复为正常状态
+
+作用：
+    用于信号，通知上层调用者有错误产生需要处理
+try 语句的两种用法
+    try-except 语句
+    try-finally 语句
+
+try-except  语句的语法
+    try:
+        可能触发异常的语句
+    except 错误类型1  [as 变量1]：
+        异常处理语句1
+    except 错误类型2  [as 变量2]：
+        异常处理语句2
+    except （错误类型3,错误类型4） [as 变量3]：
+        异常处理语句3
+    except (ValueError,ZeroDivisionError):
+    ......
+    except:
+        异常处理语句 other
+    else:
+        未发生异常的语句(此语句在未发生异常时执行)
+    finally:
+        最终语句 #此语句在离开try时 一定会被执行
+
+作用:
+    尝试捕获异常，得到错误通知，将程序由异常流程转为正常流程并继续执行
+说明：
+    as 子句是用于绑定错误对象的变量，可以省略
+    except 子句可以有一个或多个，但至少要有一个
+    else 子句最多只有一个，也可以省略不写
+    finally 子句最多只能有一个，也可以省略不写
+示例:
+#此示例示意用try-except 语句来捕获异常
+def div_apple(n):
+    print("%d个苹果您想分给几个人？"%n)
+    s=input("请输入人数:")
+    count=int(s)  #<--- 可能触发ValueError 错误
+    result = n/ count  #<---可能触发ZeroDivisionError错误
+    print("每个人分了",result,"个苹果")
+try:
+    div_apple(10)
+    print("分苹果成功")
+# except ValueError as err:   #err绑定错误对象
+#     print("分苹果失败，苹果被收回"，"err=",err)
+# except ZeroDivisionError as err:
+#     print("分苹果失败，苹果被收回！","err=",err)
+# except (ValueError,ZeroDivisionErro) as err:
+#     print("分苹果失败，苹果被收回","err=",err)
+# except:
+#     print("异常已捕获")
+else: #此子句只有在 div_apple 没有发生异常时才会执行
+    print("此try语句内没有发生任何异常")
+finally:
+    print("我是try里的 finally语句，我一定会被执行")
+
+练习：
+    写一个函数 get_score() 获取学生的成绩(0~100中的整数)，
+    如果用户输入的成绩不是0~100之间的数，则返回0
+        如:
+            def get_score():
+                s=int(input("请输入成绩(0~100)"))
+                ...
+            score=get_score()
+            print("学生的成绩是:",score)
+
+python3 中内建的全局的错误类型
+    参见文档：
+        python_base_docs_html/python 全部的异常类型.html
+
+try-finally 语句
+    语法：
+        try:
+            可能触发异常的语句
+        finally:
+            最终语句
+    说明：
+        finally 子句不可以省略
+        一定不存在 except 子句
+    作用：
+        通常用 try-finally 语句来执行触发异常时一定要执行的语句，
+        无论异常是否发生，finally 子句都会被执行
+        try-finally 语句不会改变程序的(正常/异常)状态
+示例见：
+    #此示例以煎鸡蛋的控制程序来示意try-finally语句用
+    #应用场景和作用
+def fry_egg():
+    try:
+        print("打开天然气点燃...")
+        try:
+            count=int(input("请输入鸡蛋个数："))
+            print("完成煎鸡蛋，共煎了%d个鸡蛋"%count)
+        finally:
+            print("关闭天然气") #<---此事必须要做
+    except ValueError:
+        print("煎鸡蛋失败！")
+fry_egg()
+#两种方法：
+def fry_egg():
+    print("打开天然气点燃...")
+    try:
+        count=int(input("请输入鸡蛋个数："))
+        print("完成煎鸡蛋，共煎了%d个鸡蛋"%count)
+    finally:
+        print("关闭天然气") #<---此事必须要做
+try:
+    fry_egg()
+except ValueError:
+    print("煎鸡蛋失败！")
+
+raise 语句
+    作用:
+        触发一个错误，让程序进入异常状态
+        发送错误通知给调用者
+    语法：
+        raise 异常类型
+        或
+        raise 异常对象(可以携带信息)
+        或
+        raise #重新触发上一次异常
+    说明：
+        raise 无参调用常用用于  try-execpt 的 execpt子句中
+示例见：
+def make_execpt():
+    print("开始...")
+    # raise ValueError   #触发ValueError 类型的异常
+    # raise ZeroDivisionError   #raise 类型
+    #创建一个错误对象用error来绑定
+    error = ValueError("XXX大街YYY号着火了！")
+    raise error  #触发ValueError 类型的错误对象
+    print("结束!!!")
+try:
+    make_execpt()
+    print("make_execpt 调用完成")
+except ValueError as err:
+    print("收到 ValueError类型的错误通知")
+    print("err=",err)  #err 使用来绑定 rasie 发出的错误对象
+except ZeroDivisionError:
+    print("被零除！！！")
+print("程序正常结束")
+
+#此示例示意用raise 语句来传递错误信息
+def f1():
+    n=int(input("请输入整数：")) #此处可能触发 ValueError 错误
+def f2():
+    try:
+        f1()
+    except ValueError as err:
+        print("f1函数内出错")
+        # print("f2里的err=",err)
+        # raise err
+        raise
+try:
+    f2()
+except ValueError as err:
+    print("f2内发生了ValueError类型的错误")
+    print("err=",err)
+
+练习：
+    写一个函数 gen_age() 用来获取一个人的年龄信息
+        此函数规定用户只能输入1~140之间的整数，如果用户输入其他的数
+        则直接触发ValueError 类型的错误
+    如：
+    def gen_age():
+        ...
+    try:
+        age=get_age()
+        print("用户输入的年龄是：",age)
+    except ValueError as err:
+        print("用户输入的不是1~140之间的整数")
+
+assert 语句(断言语句)
+    语法：
+        assert 真值表达式，错误数据(通常是字符串))
+    作用:
+        主动检测错误并尽早触发错误
+    说明：
+        当真值表达式为 False 时，用错误数据创建一个AssertionError
+        类型的错误，并进入异常状态
+    等同于：
+        if bool(真值表达式)  == False
+            raise AssertionError (错误数据)
+    示例：
+def get_score():
+    s=int(input("请输入学生成绩："))
+    #此 assert 语句让 s 不在范围内时主动报错
+    assert 0 <= s <= 100 ,"成绩超出范围"
+    return s
+try:
+    score = get_score()
+    print("成绩是：",score)
+except AssertionError as err:
+    print("断言失败！err =",err)
+
+异常小结：
+    四条异常处理语句：
+        try - except 语句
+            作用: 用来接收错误通知，并处理错误(异常转正常)
+        try - finally 语句
+            作用：执行必须要执行的语句(不会转换程序的状态)
+        raise 语句
+            作用：发送错误通知，让程序进入异常流程
+        assert 语句
+            根据条件发送 AssertionError 类型的异常通知，
+            让程序进入异常流程
+
+为什么要用异常处理机制
+    在程序调用层数较深时，向主调函数传递错误信息需要层层 return
+    返回比较麻烦，所以需要异常处理机制
+    示例见：
+def f1():
+    '''此函数可能触发错误'''
+    s="我是错误信息"
+    raise  ValueError(s)
+def f2():
+    f1()
+
+def f3():
+    f2()
+
+def f4():
+    f3()
+try:
+    f4()
+except ValueError as err:
+    print("err =",err)
+
+迭代器 Iterator
+    什么是迭代器
+        迭代器是访问迭代对象的工具
+        迭代器是指用 iter(obj) 函数返回的对象(实例)
+        迭代器可以用 next(it) 函数获取可迭代对象的数据
+迭代器相关的函数
+    iter(iterable) 从可迭代对象中返回一个迭代器,
+                iterable必须是一个能提供迭代器的对象
+    next(iterator) 从迭代器 iterable 中获取下一个记录，如果无法
+    获取下一条记录，则会触发 StopIteration 异常通知
+
+    说明:
+        迭代器只能往前取值，不会后退
+        用iter函数可以返回一个可迭代对象的迭代器
+    示例：
+L = [1,3,5,7]
+it = iter(L) #从对象L中获取迭代器，然后用it变量绑定
+print(next(it))     #1
+print(next(it))     #3
+print(next(it))     #5
+print(next(it))     #7
+print(next(it))     #StopIteration
+#用迭代器访问range函数返回来的对象
+it=iter(range(1,10,3))
+print(next(it))     #1
+print(next(it))     #4
+print(next(it))     #7
+print(next(it))     #StopIteration
+
+用迭代器相关函数 iter 和 next 访问可迭代对象的示例见：
+#此示例示意用迭代器遍历一个列表
+L=[2,3,5,7]
+#先让L提供一个迭代器
+it=iter(L)
+#循环从迭代器中获取数据，直到接收到StopIteration异常为止
+while True:
+    try；
+        x = next(x)
+        print(x)
+    except StopIteration:
+        break
+
+#---------以上多条语句可以用如下的for 循环来实现
+for x in L:
+    print(x)
+
+练习:
+    1.有一个集合：
+    s={"唐僧","悟空","八戒","沙僧"}
+    用for 语句遍历所有元素如下：
+        for x in s :
+            print(s)
+        else:
+            print("遍历结束")
+    请将上面的for语句改写为while 语句的迭代器实现
+    2.一个小球从100米高空落下，每次落地后反弹高度为原高度的一半
+    再落下，
+    1)写程序算出皮球在第10次落地后反弹多高
+    2)打印出第10次反弹后小球经历的总路程
+    3.修改原学生信息管理程序，加入异常处理语句，让程序在任何情况下
+    都能按逻辑正常执行不至于崩溃，
+    如：输入年龄时，输入非数字字符会崩溃
+

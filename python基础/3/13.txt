@@ -1,0 +1,231 @@
+sys 模块
+    此模块记录运行时系统相关的信息
+    文档参见:sys模块
+
+自定义模块
+    要求:
+        模块文件名后缀必须以.py结尾
+        模块文件名必须是合法的标识符
+        避免名称和内建模块名冲突
+    模块的属性就是指模块中的全局变量
+    导入方式：
+        import 语句
+        from import 语句
+        from import *语句
+
+def myfac(n):
+    print("正在计算",n,"的阶乘")
+def mysum(n):
+    print("正在计算1+2+3+...%d 的和" % n)
+name1 = "audi"
+name2 = "tesla"
+print("mymod 模块被加载")
+#此程序示意导入mymod.py 模块，并调用内部的函数打印 mymod.py内部的数据
+
+import mymod #导入自定义模块(注意，不用加.py)
+
+mymod.myfac(5)
+mymod.mysum(100)
+print(mymod.name1)
+
+from mymod import name2
+print("name2=",name)
+from mymod import *
+myfac(20)
+
+import 语句搜索模块的路径顺序:
+    1.搜索内建模块
+    2.搜索程序运行时的路径(当前路径)
+    3.搜索sys.path提供的路径
+        sys.path绑定一个列表，里面放的都是模块的搜索路径
+        import sys
+        print(sys.path)
+
+模块化编程的优点:
+    1.有利于多人合作开发
+    2.使代码更易于维护
+    3.提发代码的复用率（模块可以同时被很多模块同时导入）
+    4.模块化编程有助于解决函数名和变量名冲突(重名)，模块内的
+    变量的作用域在模块内为全局
+
+模块的加载过程
+    在模块导入时，模块的所有语句都会执行
+    如果一个模块已经导入，则再次导入时，不会重新执行模块内的语句
+
+模块的重新加载
+    示例:
+    import mymod
+    import imp
+    imp.reload(mymod)  #重新导入mymod模块
+模块被导入和执行的过程
+    1.先搜索相关的路径找模块(.py文件)
+    2.判断是否有此模块对应的.pyc文件，如果是有.pyc文件且.pyc文件
+    比.py文件新，则直接加载.pyc文件
+    3.否则先用.py文件生成.pyc文件，然后再加载.pyc文件
+
+pyc 模块的编译  文件(python compile)
+        编译                解释执行
+    mymod.py------>mymod.pyc------>python3
+
+模块的属性
+    1.模块的文档字符串
+        模块内第一次没有赋值给任何变量的字符串是模块的文档字符串
+        模块的文档字符串绑定在模块的__doc__属性上
+    2.模块的__file__属性
+    用于绑定模块的路径
+    如：
+        import mymod
+        print(mymod.__file__)   #/home/tarena/aid1811/pbase/day13/code/mymod.py
+    3.模块的__name__属性
+        __name__属性用来记录模块的自身的名字
+        作用:
+            1.记录模块名
+            2.用来判断当前模块是否是主模块
+        说明:
+            1.当此模块作为主模块(也就是它是第一个运行的模块)运行时，
+            __name__绑定'__main__'
+            2.当此模块不是主模块，则是被其它模块导入时，此属性绑定
+            模块名，即
+                xxx.py 的模块名为 xxx
+        示例见:
+
+    模块内的__all__列表
+        模块中的__all__列表是一个用来存放可导出属性的字符串列表
+        作用:
+            当用 from xxx import * 导入时，只导入__all__列表内的属性
+        示例:
+        #此__all__列表限制在 from mymod import * 时
+        #只导入f1 和 name1 其它会被忽略
+        __all__=[f1,"name1"]
+            def f1():
+                f2()
+                f3()
+            def f2():
+                pass
+            def f3():
+                pass
+
+            name1 = "aaa"
+            name2 = "bbb"
+        注: __all__列表只对 from import * 语句有效，对其它导入语句无效
+模块的隐藏属性
+    模块中以下划线(_) 开头的属性，在 from xxx import * 语句导入时将不被导入，
+    通常称这些属性为隐藏属性
+    #此示例示意模块的隐藏属性
+    #隐藏属性不会被 from import *语句导入
+    def f():
+        pass
+    def _f():
+        pass
+    def __f():
+        pass
+    name1="aaa"
+    _name="bbb"
+
+随机模块  randow
+    作用:
+        用于模拟或生成随机输出的模块
+    文档参见：
+
+练习：
+    1.猜数字游戏：
+    随机生成一个0~100之间的整数，用变量X绑定
+    让用户输入一个数用变量y绑定，然后输出猜数字的结果
+    1）如果y等于生成的数x，则提示用户"恭喜您猜对了"，并退出程序
+    2）如果y大于x则提示：您猜的数字大了，然后继续猜
+    3）如果y小于x，则提示：您猜小了，然后继续猜
+    知道猜对为止，最后显示用户猜数字的次数
+
+包（模块包） package
+    包是将模块以文件夹的组织形式进行分组管理的方法
+
+    包的作用:
+        将一系列模块进行分类管理，有利于访问命名冲突
+        可以在需要时加载一个或部分模块而不是全部模块
+    包示例：
+    mypack/
+        __init__.py
+        menu.py
+        games/
+            __init__.py
+            contra.py
+            supermario.py
+            tanks.py
+        office/
+            __init__.py
+            word.py
+            excel.py
+
+包的导入方式:
+    同模块的导入规则
+        import 包名 [as 包别名]
+        import 包名.模块名 [as 模块新名]
+        import 包名.子包名.模块名 [as 模块新名]
+        ...
+
+        from 包名 import 模块名 [as 模块新名]
+        from 包名.子包名 import 模块名 [as 模块新名]
+        from 包名.子包名.模块名 import 属性名 [as 属性新名]
+
+        from 包名 import *
+        from 包名.模块名 import *
+        from 包名.子包名.模块名 import *
+
+import 语句 搜索包的路径顺序
+    1.搜索程序的运行时路径(当前工作目录)
+    2.搜索sys.path提供的路径
+
+__init__.py 文件
+    __init__.py 是常规包内必须存在的文件
+    __init__.py 会在包加载时自动调用
+
+    作用：
+        编写此包的内容
+        在内部填写包的文档字符串
+        在__init__.py 文件内可以加载此包所依赖的一些其他模块
+__init__.py 内的 __all__列表
+    作用:
+        用来记录此包中有哪些子包或模块需要导入
+        当用 from 包  import * 语句导入时，值查找 __all__ 列表中所有的模块或子包
+    说明:
+        __all__ 列表只对 from xxx import * 起作用：
+    示例：
+
+
+包的相对导入
+    包的相对导入时指包内模块的相互导入
+
+    语法：
+        from 相对路径包或模块 import 属性或模块
+        或
+        from 相对路径包或模块 import *
+    相对路径：
+        from import 语句中 from 和 import 间可以用相对路径
+        . 代表当前目录
+        .. 代表上一级级目录
+        ... 代表上二级目录
+        .... 以此类推
+    说明：
+        相对导入时，不能超出包的外部
+        相对导入不能用于 import 语句中
+    示例见：
+        mypack/games/contra.py 里的 gameover 函数
+        import mypack.games.contra as contra
+        contra.play
+        #contra.gameover()
+
+练习：
+    1.写一个程序，模拟斗地主发牌，牌共54张
+      种类有:黑桃('\u2660'),梅花('\u2663')，红桃('\u2665'),方块('\u2666')
+      数字有:A2-10JQK
+      大王和小王
+      输入回车，打印第1个人的17张牌
+      输入回车，打印第2个人的17张牌
+      输入回车，打印第3个人的17张牌
+      输入回车，打印最后3张底牌
+    2.将学生信息管理系统程序拆分为模块
+    要求:
+      1).主事件循环的main函数放在 main.py 中
+      2).显示菜单的函数 show_menu 放在 menu.py中
+      3).与学生信息操作相关的函数放在student_info.py中
+
